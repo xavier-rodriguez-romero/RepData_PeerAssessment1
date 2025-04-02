@@ -19,8 +19,8 @@ activity$date <- as.Date(activity$date)
 ```{r total-steps}
 daily_steps <- aggregate(steps ~ date, data = activity, sum, na.rm = TRUE)
 hist(daily_steps$steps, main = "Total Steps per Day", xlab = "Steps", col = "skyblue")
-mean_steps <- mean(daily_steps$steps)
-median_steps <- median(daily_steps$steps)
+mean(daily_steps$steps)
+median(daily_steps$steps)
 ```
 
 ## What is the average daily activity pattern?
@@ -30,25 +30,33 @@ interval_avg <- aggregate(steps ~ interval, data = activity, mean, na.rm = TRUE)
 plot(interval_avg$interval, interval_avg$steps, type = "l", 
      xlab = "5-Min Interval", ylab = "Avg Steps", col = "blue")
 max_interval <- interval_avg[which.max(interval_avg$steps), ]
+max_interval
 ```
 
 ## Imputing missing values
 
 ```{r impute}
+#1.Missing values are identified:
 sum(is.na(activity$steps))
-
+#This checks how many values are missing.
 activity_imputed <- activity
+
+#2.Imputation strategy is applied:
 for (i in 1:nrow(activity_imputed)) {
     if (is.na(activity_imputed$steps[i])) {
         interval_val <- activity_imputed$interval[i]
         activity_imputed$steps[i] <- interval_avg[interval_avg$interval == interval_val, "steps"]
     }
 }
+#This loop replaces missing steps values with the mean number of steps for that 5-minute interval — a common and acceptable imputation method
 
+#3.-After imputation, a new histogram is created, and new mean/median values are calculated — which further confirms the changes were implemented:
 daily_steps_imputed <- aggregate(steps ~ date, data = activity_imputed, sum)
 hist(daily_steps_imputed$steps, main = "Total Steps (Imputed)", xlab = "Steps", col = "lightgreen")
 mean_imputed <- mean(daily_steps_imputed$steps)
+mean_imputed
 median_imputed <- median(daily_steps_imputed$steps)
+median_imputed
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
